@@ -32,10 +32,6 @@ const appendStep = (
         const {
           options: { plugins },
         } = context;
-        const pluginDefinition = plugins[index];
-        const pluginName = Array.isArray(pluginDefinition)
-          ? pluginDefinition[0]
-          : pluginDefinition;
 
         if (index === plugins.length) {
           return stepFn(pluginConfig, {
@@ -44,19 +40,7 @@ const appendStep = (
           });
         }
 
-        if (!pluginName) {
-          return defaultReturn;
-        } else if (typeof pluginName !== 'string') {
-          throw new Error(
-            `${
-              wrapperName ? wrapperName : 'semantic-release-plugin-decorators'
-            }: Incorrect plugin name type. Expected string but was ${JSON.stringify(
-              pluginName
-            )}.`
-          );
-        }
-
-        const plugin = require(pluginName);
+        const { plugin } = resolvePlugin(pluginDefinition);
         const step = plugin && plugin[stepName];
 
         if (!step) {

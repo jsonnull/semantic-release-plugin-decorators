@@ -1,3 +1,4 @@
+const resolvePlugin = require('./resolvePlugin');
 /**
  * Wrap each `semantic-release` lifecycle step function to inject custom logic into
  * `semantic-release`'s plugin system, augmenting its functionality without making
@@ -36,6 +37,18 @@ const wrapStep = (
         }
 
         const pluginDefinition = plugins[index];
+
+        if (!pluginDefinition) {
+          context.logger.log(`Falsy plugin name at index "${index}"`);
+          return defaultReturn;
+        }
+
+        const {
+          plugin,
+          pluginConfig,
+          pluginName = '[unnamed]',
+        } = resolvePlugin(pluginDefinition);
+        /*
         const [pluginName, pluginConfig] = Array.isArray(pluginDefinition)
           ? pluginDefinition
           : [pluginDefinition, {}];
@@ -53,8 +66,8 @@ const wrapStep = (
             )}.`
           );
         }
+        */
 
-        const plugin = require(pluginName);
         const step = plugin && plugin[stepName];
 
         if (!step) {
